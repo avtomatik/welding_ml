@@ -1,5 +1,3 @@
-import re
-from functools import cache
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -23,21 +21,12 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
+from bmstu_graduate_project.src.data.make_dataset import (get_data_frame,
+                                                          get_X_y)
+from bmstu_graduate_project.src.utils.trim_string import trim_string
+
 print(f"scikit-learn Version: {sklearn.__version__}")
 print(f"TensorFlow Version: {tf.__version__}")
-
-
-def trim_string(string: str, fill: str = ' ') -> str:
-    return fill.join(filter(lambda _: _, re.split(r"\W", string))).lower()
-
-
-@cache
-def get_data_frame() -> pd.DataFrame:
-    return pd.read_csv("../data/raw/dataset.csv")
-
-
-def get_X_y(df: pd.DataFrame) -> tuple[np.ndarray]:
-    return df.iloc[:, :4].values, df.iloc[:, 4:].values
 
 
 def plot_model_train_val_losses(history_dict: dict[str, list[float]]) -> None:
