@@ -6,6 +6,9 @@ import pandas as pd
 import seaborn as sns
 import sklearn
 import tensorflow as tf
+from bmstu_graduate_project.src.data.make_dataset import (get_data_frame,
+                                                          get_X_y)
+from bmstu_graduate_project.src.utils.trim_string import trim_string
 from joblib import dump
 from scipy import stats
 from sklearn.ensemble import (AdaBoostRegressor, BaggingRegressor,
@@ -21,12 +24,8 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
-from bmstu_graduate_project.src.data.make_dataset import (get_data_frame,
-                                                          get_X_y)
-from bmstu_graduate_project.src.utils.trim_string import trim_string
-
-print(f"scikit-learn Version: {sklearn.__version__}")
-print(f"TensorFlow Version: {tf.__version__}")
+print(f'scikit-learn Version: {sklearn.__version__}')
+print(f'TensorFlow Version: {tf.__version__}')
 
 
 def plot_model_train_val_losses(history_dict: dict[str, list[float]]) -> None:
@@ -37,9 +36,9 @@ def plot_model_train_val_losses(history_dict: dict[str, list[float]]) -> None:
     for array in history_dict.values():
         plt.plot(array)
 
-    plt.title("Loss Plot")
-    plt.xlabel("Epoch")
-    plt.ylabel("MAE")
+    plt.title('Loss Plot')
+    plt.xlabel('Epoch')
+    plt.ylabel('MAE')
     plt.legend(history_dict.keys())
     plt.grid()
     plt.show()
@@ -54,7 +53,7 @@ def plot_multi_output_solver(
 ) -> None:
     assert y_test.shape[1] == 2 and y_pred.shape[1] == 2
 
-    caption = solver.get_params()["estimator"] if isinstance(
+    caption = solver.get_params()['estimator'] if isinstance(
         solver, MultiOutputRegressor
     ) else type(solver).__name__
 
@@ -62,32 +61,32 @@ def plot_multi_output_solver(
     plt.scatter(
         y_test[:, 0],
         y_test[:, 1],
-        edgecolor="k",
-        c="navy",
+        edgecolor='k',
+        c='navy',
         s=size,
-        marker="s",
+        marker='s',
         alpha=alpha,
-        label="Data",
+        label='Data',
     )
     plt.scatter(
         y_pred[:, 0],
         y_pred[:, 1],
-        edgecolor="k",
-        c="cornflowerblue",
+        edgecolor='k',
+        c='cornflowerblue',
         s=size,
         alpha=alpha,
         label=(
-            f"MAE: {maes[caption]:,.6f}; "
-            f"MSE: {mses[caption]:,.6f}; "
-            f"$R^2$: {r2_s[caption]:,.6f}"
+            f'MAE: {maes[caption]:,.6f}; '
+            f'MSE: {mses[caption]:,.6f}; '
+            f'$R^2$: {r2_s[caption]:,.6f}'
         )
     )
     plt.xlim([-3, 3])
     plt.ylim([-2, 4])
-    plt.xlabel("depth")
-    plt.ylabel("width")
+    plt.xlabel('depth')
+    plt.ylabel('width')
     plt.title(caption)
-    plt.legend(loc="upper left")
+    plt.legend(loc='upper left')
     plt.grid()
     plt.show()
 
@@ -105,7 +104,7 @@ DESCRIPTION = {
 }
 CV = 5
 RANDOM_STATE = 42
-MODEL_DIR = "../models"
+MODEL_DIR = '../models'
 
 # =============================================================================
 # Data Collection
@@ -132,7 +131,7 @@ vif = pd.DataFrame(
         (column, variance_inflation_factor(df_scaled.values, _))
         for _, column in enumerate(df_scaled.columns)
     ),
-    columns=("features", "vif_Factor")
+    columns=('features', 'vif_Factor')
 )
 # vif
 
@@ -142,7 +141,7 @@ with sns.axes_style('darkgrid'):
         # Box Plot
         # =====================================================================
         plt.figure(figsize=(8, 5))
-        sns.boxplot(data=df_scaled, orient="h")
+        sns.boxplot(data=df_scaled, orient='h')
 
         # =====================================================================
         # Distribution Plot
@@ -154,13 +153,13 @@ with sns.axes_style('darkgrid'):
         # Correlation Matrix
         # =====================================================================
         plt.figure(figsize=(8, 5))
-        sns.heatmap(data=df_scaled.corr(), cmap="YlGnBu", annot=True)
+        sns.heatmap(data=df_scaled.corr(), cmap='YlGnBu', annot=True)
 
         # =====================================================================
         # Pair Plot
         # =====================================================================
         plt.figure(figsize=(8, 5))
-        sns.pairplot(data=df_scaled, diag_kind="kde")
+        sns.pairplot(data=df_scaled, diag_kind='kde')
 
         # =====================================================================
         # Violin Plot
@@ -218,10 +217,10 @@ for solver in (
 best_mae = min(maes, key=maes.get)
 best_mse = min(mses, key=mses.get)
 best_r_2 = max(r2_s, key=r2_s.get)
-print("Linear Models Results:")
-print(f"Best Solver In Terms of <MAE> Is: {best_mae} = {maes[best_mae]:,.6f}")
-print(f"Best Solver In Terms of <MSE> Is: {best_mse} = {mses[best_mse]:,.6f}")
-print(f"Best Solver In Terms of <R**2> Is: {best_r_2} = {r2_s[best_r_2]:,.6f}")
+print('Linear Models Results:')
+print(f'Best Solver In Terms of <MAE> Is: {best_mae} = {maes[best_mae]:,.6f}')
+print(f'Best Solver In Terms of <MSE> Is: {best_mse} = {mses[best_mse]:,.6f}')
+print(f'Best Solver In Terms of <R**2> Is: {best_r_2} = {r2_s[best_r_2]:,.6f}')
 
 
 # =============================================================================
@@ -260,10 +259,10 @@ for solver in (
 best_mae = min(maes, key=maes.get)
 best_mse = min(mses, key=mses.get)
 best_r_2 = max(r2_s, key=r2_s.get)
-print("Ensembles Results:")
-print(f"Best Solver In Terms of <MAE> Is: {best_mae} = {maes[best_mae]:,.6f}")
-print(f"Best Solver In Terms of <MSE> Is: {best_mse} = {mses[best_mse]:,.6f}")
-print(f"Best Solver In Terms of <R**2> Is: {best_r_2} = {r2_s[best_r_2]:,.6f}")
+print('Ensembles Results:')
+print(f'Best Solver In Terms of <MAE> Is: {best_mae} = {maes[best_mae]:,.6f}')
+print(f'Best Solver In Terms of <MSE> Is: {best_mse} = {mses[best_mse]:,.6f}')
+print(f'Best Solver In Terms of <R**2> Is: {best_r_2} = {r2_s[best_r_2]:,.6f}')
 
 
 # =============================================================================
@@ -271,24 +270,24 @@ print(f"Best Solver In Terms of <R**2> Is: {best_r_2} = {r2_s[best_r_2]:,.6f}")
 # =============================================================================
 ESTIMATORS = {
     BaggingRegressor(random_state=RANDOM_STATE): {
-        "estimator__n_estimators": [10, 20, 25, 50, 100],
-        # "estimator__max_samples": [12, 14, 18, 24],
-        # "estimator__max_features": [2, 3, 4],
+        'estimator__n_estimators': [10, 20, 25, 50, 100],
+        # 'estimator__max_samples': [12, 14, 18, 24],
+        # 'estimator__max_features': [2, 3, 4],
     },
     GradientBoostingRegressor(random_state=RANDOM_STATE): {
-        # "estimator__loss": ['squared_error', 'absolute_error', 'huber', 'quantile'],
-        "estimator__n_estimators": [10, 20, 25, 50, 100],
-        # "estimator__min_samples_split": [2, 3, 4, 5],
-        # "estimator__min_samples_leaf": [1, 2, 3, 4],
-        # "estimator__max_depth": [1, 2, 3, 4],
-        # "estimator__max_features": ['sqrt', 'log2'],
+        # 'estimator__loss': ['squared_error', 'absolute_error', 'huber', 'quantile'],
+        'estimator__n_estimators': [10, 20, 25, 50, 100],
+        # 'estimator__min_samples_split': [2, 3, 4, 5],
+        # 'estimator__min_samples_leaf': [1, 2, 3, 4],
+        # 'estimator__max_depth': [1, 2, 3, 4],
+        # 'estimator__max_features': ['sqrt', 'log2'],
     },
     RandomForestRegressor(random_state=RANDOM_STATE): {
-        "estimator__n_estimators": [10, 20, 25, 50, 100],
-        # "estimator__criterion": ['squared_error', 'absolute_error', 'poisson'],
-        # "estimator__min_samples_split": [2, 3, 4, 5],
-        # "estimator__min_samples_leaf": [1, 2, 3, 4],
-        # "estimator__max_features": [2, 3, 4],
+        'estimator__n_estimators': [10, 20, 25, 50, 100],
+        # 'estimator__criterion': ['squared_error', 'absolute_error', 'poisson'],
+        # 'estimator__min_samples_split': [2, 3, 4, 5],
+        # 'estimator__min_samples_leaf': [1, 2, 3, 4],
+        # 'estimator__max_features': [2, 3, 4],
     },
 }
 
@@ -311,13 +310,13 @@ for estimator, param_grid in ESTIMATORS.items():
     y_pred = best_estimator.predict(X_test)
     print(best_estimator.get_params())
 
-    maes[best_estimator.get_params()["estimator"]] = mean_absolute_error(
+    maes[best_estimator.get_params()['estimator']] = mean_absolute_error(
         y_test, y_pred
     )
-    mses[best_estimator.get_params()["estimator"]] = mean_squared_error(
+    mses[best_estimator.get_params()['estimator']] = mean_squared_error(
         y_test, y_pred
     )
-    r2_s[best_estimator.get_params()["estimator"]] = r2_score(
+    r2_s[best_estimator.get_params()['estimator']] = r2_score(
         y_test, y_pred
     )
     # =========================================================================
@@ -328,28 +327,28 @@ for estimator, param_grid in ESTIMATORS.items():
     # =========================================================================
     # Save Model
     # =========================================================================
-    file_name = f'sklearn_grid_search_{trim_string(str(best_estimator.get_params()["estimator"]))}.joblib'
+    file_name = f'sklearn_grid_search_{trim_string(str(best_estimator.get_params()['estimator']))}.joblib'
     dump(best_estimator, Path(MODEL_DIR).joinpath(file_name))
 
 
 best_mae = min(maes, key=maes.get)
 best_mse = min(mses, key=mses.get)
 best_r_2 = max(r2_s, key=r2_s.get)
-print("Grid Search Results:")
+print('Grid Search Results:')
 print(
-    f"Best Solver In Terms of <MAE> Is:\n"
-    f" {best_mae}\n"
-    f" MAE = {maes[best_mae]:,.6f}\n"
+    f'Best Solver In Terms of <MAE> Is:\n'
+    f' {best_mae}\n'
+    f' MAE = {maes[best_mae]:,.6f}\n'
 )
 print(
-    f"Best Solver In Terms of <MSE> Is:\n"
-    f" {best_mse}\n"
-    f" MSE = {mses[best_mse]:,.6f}\n"
+    f'Best Solver In Terms of <MSE> Is:\n'
+    f' {best_mse}\n'
+    f' MSE = {mses[best_mse]:,.6f}\n'
 )
 print(
-    f"Best Solver In Terms of <R**2> Is:\n"
-    f" {best_r_2}\n"
-    f" R**2 = {r2_s[best_r_2]:,.6f}\n"
+    f'Best Solver In Terms of <R**2> Is:\n'
+    f' {best_r_2}\n'
+    f' R**2 = {r2_s[best_r_2]:,.6f}\n'
 )
 
 
@@ -360,12 +359,12 @@ model = Sequential()
 model.add(
     Dense(32,
           input_dim=X.shape[1],
-          kernel_initializer="he_uniform",
-          activation="relu")
+          kernel_initializer='he_uniform',
+          activation='relu')
 )
 model.add(Dropout(.05))
 model.add(Dense(y.shape[1]))
-model.compile(optimizer="adam", loss="mae")
+model.compile(optimizer='adam', loss='mae')
 # =============================================================================
 # Architecture
 # =============================================================================
