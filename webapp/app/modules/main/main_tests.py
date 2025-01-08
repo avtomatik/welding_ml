@@ -1,5 +1,5 @@
-import unittest
 import json
+import unittest
 
 from app.modules.main.controller import MainController
 
