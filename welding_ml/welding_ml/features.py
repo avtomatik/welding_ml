@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from data.make_dataset import get_data_frame
 from sklearn.preprocessing import StandardScaler
+
+from .dataset import get_data_frame
 
 
 def get_X_y(df: pd.DataFrame) -> tuple[np.ndarray]:

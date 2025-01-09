@@ -6,9 +6,6 @@ import pandas as pd
 import seaborn as sns
 import sklearn
 import tensorflow as tf
-from bmstu_graduate_project.src.data.make_dataset import (get_data_frame,
-                                                          get_X_y)
-from bmstu_graduate_project.src.utils.trim_string import trim_string
 from joblib import dump
 from scipy import stats
 from sklearn.ensemble import (AdaBoostRegressor, BaggingRegressor,
@@ -24,87 +21,15 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
+from .config import CV, MODEL_DIR, RANDOM_STATE
+from .dataset import get_data_frame
+from .features import get_X_y
+from .plots import plot_model_train_val_losses, plot_multi_output_solver
+from .utils import trim_string
+
 print(f'scikit-learn Version: {sklearn.__version__}')
 print(f'TensorFlow Version: {tf.__version__}')
 
-
-def plot_model_train_val_losses(history_dict: dict[str, list[float]]) -> None:
-    """
-    Plots Train & Validation Losses per Epoch
-    """
-    plt.figure(figsize=(8, 5))
-    for array in history_dict.values():
-        plt.plot(array)
-
-    plt.title('Loss Plot')
-    plt.xlabel('Epoch')
-    plt.ylabel('MAE')
-    plt.legend(history_dict.keys())
-    plt.grid()
-    plt.show()
-
-
-def plot_multi_output_solver(
-    y_test: np.ndarray,
-    y_pred: np.ndarray,
-    solver,
-    size: int = 50,
-    alpha: float = .4
-) -> None:
-    assert y_test.shape[1] == 2 and y_pred.shape[1] == 2
-
-    caption = solver.get_params()['estimator'] if isinstance(
-        solver, MultiOutputRegressor
-    ) else type(solver).__name__
-
-    plt.figure()
-    plt.scatter(
-        y_test[:, 0],
-        y_test[:, 1],
-        edgecolor='k',
-        c='navy',
-        s=size,
-        marker='s',
-        alpha=alpha,
-        label='Data',
-    )
-    plt.scatter(
-        y_pred[:, 0],
-        y_pred[:, 1],
-        edgecolor='k',
-        c='cornflowerblue',
-        s=size,
-        alpha=alpha,
-        label=(
-            f'MAE: {maes[caption]:,.6f}; '
-            f'MSE: {mses[caption]:,.6f}; '
-            f'$R^2$: {r2_s[caption]:,.6f}'
-        )
-    )
-    plt.xlim([-3, 3])
-    plt.ylim([-2, 4])
-    plt.xlabel('depth')
-    plt.ylabel('width')
-    plt.title(caption)
-    plt.legend(loc='upper left')
-    plt.grid()
-    plt.show()
-
-
-# =============================================================================
-# Constants
-# =============================================================================
-DESCRIPTION = {
-    'IW': 'Величина сварочного тока',
-    'IF': 'Ток фокусировки электронного пучка',
-    'VW': 'Скорость сварки',
-    'FP': 'Расстояние от поверхности образцов до электронно-оптической системы',
-    'Depth': 'Глубина шва',
-    'Width': 'Ширина шва'
-}
-CV = 5
-RANDOM_STATE = 42
-MODEL_DIR = '../models'
 
 # =============================================================================
 # Data Collection
@@ -327,7 +252,10 @@ for estimator, param_grid in ESTIMATORS.items():
     # =========================================================================
     # Save Model
     # =========================================================================
-    file_name = f'sklearn_grid_search_{trim_string(str(best_estimator.get_params()['estimator']))}.joblib'
+    file_name = (
+        'sklearn_grid_search_'
+        f'{trim_string(str(best_estimator.get_params()["estimator"]))}.joblib'
+    )
     dump(best_estimator, Path(MODEL_DIR).joinpath(file_name))
 
 
