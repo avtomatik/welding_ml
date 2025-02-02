@@ -1,6 +1,3 @@
-import json
-
-
 class TestMain():
     def test_index(self, client):
         response = client.get('/')

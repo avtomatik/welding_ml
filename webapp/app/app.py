@@ -31,12 +31,12 @@ import sys
 
 import numpy as np
 from flask import Flask, render_template, request
+from welding_ml.features import get_X_y_scalers
+from welding_ml.modeling.predict import load_trained_model
 
 SRC_DIR = '/home/green-machine/data_science/bmstu_graduate_project/src'
 sys.path.insert(1, SRC_DIR)
 
-from features.build_features import get_X_y_scalers
-from models.predict_model import load_trained_model
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def init():
     return (*get_X_y_scalers(), load_trained_model())
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['GET', 'POST'])
 def main():
     if request.method == 'GET':
         return render_template('index.html')
