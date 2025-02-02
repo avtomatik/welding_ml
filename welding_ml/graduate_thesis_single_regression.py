@@ -1,5 +1,3 @@
-from functools import cache
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -17,26 +15,22 @@ from sklearn.model_selection import train_test_split, validation_curve
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from .config import RANDOM_STATE
+
+from .dataset import get_data_frame
+from .features import get_X_y
 
 print(f'scikit-learn Version: {sklearn.__version__}')
 
 
-@cache
-def get_data_frame() -> pd.DataFrame:
-    return pd.read_csv('../data/ebw_data.csv')
-
-
 def get_X(df: pd.DataFrame) -> np.ndarray:
-    return df.iloc[:, :4].values
-    # return df.iloc[:, :4].values[:, np.newaxis]
+    n_columns = 4
+    return df.iloc[:, :n_columns].values
+    # return df.iloc[:, :n_columns].values[:, np.newaxis]
 
 
 def get_y(df: pd.DataFrame, regressor: str = 'depth') -> np.ndarray:
     return df.loc[:, regressor.title()].values
-
-
-def get_X_y(df: pd.DataFrame) -> tuple[np.ndarray]:
-    return df.iloc[:, :4].values, df.iloc[:, 4:].values
 
 
 def fit_linear_cv_model(X, regressor: str, model):
@@ -56,25 +50,22 @@ def fit_linear_cv_model(X, regressor: str, model):
     print(f'R^2: {r2_:,.6f}')
 
 
-DESCRIPTION = {
-    'IW': 'Величина сварочного тока',
-    'IF': 'Ток фокусировки электронного пучка',
-    'VW': 'Скорость сварки',
-    'FP': 'Расстояние от поверхности образцов до электронно-оптической системы',
-    'Depth': 'Глубина шва',
-    'Width': 'Ширина шва'
-}
-
+# =============================================================================
+# Data Collection
+# =============================================================================
 df = get_data_frame()
-# # df.describe()
-# # df.info()
 
 # =============================================================================
-# Create Scaled DataFrame
+# Exploratory Data Analysis, EDA
+# =============================================================================
+df.info()
+print(df.describe())
+
+# =============================================================================
+# Data Preprocessing: Create Scaled DataFrame
 # =============================================================================
 scaler = StandardScaler()
 df_scaled = pd.DataFrame(data=scaler.fit_transform(df), columns=df.columns)
-
 
 # =============================================================================
 # Variance Inflation Factor
@@ -88,68 +79,72 @@ vif = pd.DataFrame(
 )
 # vif
 
-# with sns.axes_style('darkgrid'):
-#     with sns.plotting_context('notebook', font_scale=1.5):
-#         # =====================================================================
-#         # Box Plot
-#         # =====================================================================
-#         plt.figure(figsize=(8, 5))
-#         sns.boxplot(data=df_scaled, orient='h')
+with sns.axes_style('darkgrid'):
+    with sns.plotting_context('notebook', font_scale=1.5):
+        # =====================================================================
+        # Box Plot
+        # =====================================================================
+        plt.figure(figsize=(8, 5))
+        sns.boxplot(data=df_scaled, orient='h')
 
-#         # =====================================================================
-#         # Distribution Plot
-#         # =====================================================================
-#         for column in df_scaled.columns:
-#             sns.displot(data=df_scaled, x=column, kde=True)
+        # =====================================================================
+        # Distribution Plot
+        # =====================================================================
+        for column in df_scaled.columns:
+            sns.displot(data=df_scaled, x=column, kde=True)
 
-#         # =====================================================================
-#         # Correlation Matrix
-#         # =====================================================================
-#         plt.figure(figsize=(8, 5))
-#         sns.heatmap(data=df_scaled.corr(), cmap='YlGnBu', annot=True)
+        # =====================================================================
+        # Correlation Matrix
+        # =====================================================================
+        plt.figure(figsize=(8, 5))
+        sns.heatmap(data=df_scaled.corr(), cmap='YlGnBu', annot=True)
 
-#         # =====================================================================
-#         # Pair Plot
-#         # =====================================================================
-#         plt.figure(figsize=(8, 5))
-#         sns.pairplot(data=df_scaled, diag_kind='kde')
+        # =====================================================================
+        # Pair Plot
+        # =====================================================================
+        plt.figure(figsize=(8, 5))
+        sns.pairplot(data=df_scaled, diag_kind='kde')
 
-#         # =====================================================================
-#         # Violin Plot
-#         # =====================================================================
-#         plt.figure(figsize=(8, 5))
-#         sns.violinplot(data=df_scaled)
+        # =====================================================================
+        # Violin Plot
+        # =====================================================================
+        plt.figure(figsize=(8, 5))
+        sns.violinplot(data=df_scaled)
 
 
-# # $\sigma = 1.4$ is the Optimum for Trimming In Terms of Outliers
-# # df_trimmed = df_scaled[(np.abs(stats.zscore(df_scaled)) < 1.4).all(axis=1)]
-# # df_trimmed
+# $\sigma = 1.4$ is the Optimum for Trimming In Terms of Outliers
+df_trimmed = df_scaled[(np.abs(stats.zscore(df_scaled)) < 1.4).all(axis=1)]
+# df_trimmed
 
-# random_state = 42
-# # # # =============================================================================
-# # # # Linear Models
-# # # # =============================================================================
-# # # X = df_scaled.pipe(get_X)
-# # # for model in (
-# # #         ElasticNetCV(cv=5, random_state=random_state),
-# # #         LassoCV(cv=5, random_state=random_state),
-# # #         RidgeCV(cv=5)
-# # # ):
-# # #     for regressor in ('depth', 'width'):
-# # #         fit_linear_cv_model(X, regressor, model)
+
+CV = 5
+
+# =============================================================================
+# scikit-learn: Linear Models
+# =============================================================================
+# =============================================================================
+# X = df_scaled.pipe(get_X)
+# for solver in (
+#     ElasticNetCV(cv=CV, random_state=RANDOM_STATE),
+#     LassoCV(cv=CV, random_state=RANDOM_STATE),
+#     RidgeCV(cv=CV)
+# ):
+#     for regressor in ('depth', 'width'):
+#         fit_linear_cv_model(X, regressor, solver)
+# =============================================================================
 
 
 # # =============================================================================
 # # Ensembles
 # # =============================================================================
 # X = df_scaled.pipe(get_X)
-# for ensemble in (
-#     AdaBoostRegressor(random_state=random_state),
-#     BaggingRegressor(random_state=random_state),
-#     ExtraTreesRegressor(random_state=random_state),
-#     GradientBoostingRegressor(random_state=random_state),
-#     HistGradientBoostingRegressor(random_state=random_state),
-#     RandomForestRegressor(random_state=random_state),
+# for solver in (
+#     AdaBoostRegressor(random_state=RANDOM_STATE),
+#     BaggingRegressor(random_state=RANDOM_STATE),
+#     ExtraTreesRegressor(random_state=RANDOM_STATE),
+#     GradientBoostingRegressor(random_state=RANDOM_STATE),
+#     HistGradientBoostingRegressor(random_state=RANDOM_STATE),
+#     RandomForestRegressor(random_state=RANDOM_STATE),
 # ):
 #     for regressor in ('depth', 'width'):
 #         y = df_scaled.pipe(get_y, regressor=regressor)
@@ -157,11 +152,11 @@ vif = pd.DataFrame(
 #             X, y, train_size=.8
 #         )
 
-#         ensemble.fit(X_train, y_train)
+#         solver.fit(X_train, y_train)
 
-#         mae = mean_absolute_error(y_test, ensemble.predict(X_test))
-#         mse = mean_squared_error(y_test, ensemble.predict(X_test))
-#         r2_ = r2_score(y_test, ensemble.predict(X_test))
+#         mae = mean_absolute_error(y_test, solver.predict(X_test))
+#         mse = mean_squared_error(y_test, solver.predict(X_test))
+#         r2_ = r2_score(y_test, solver.predict(X_test))
 
 #         print(f'MAE: {mae:,.6f}')
 #         print(f'MSE: {mse:,.6f}')
@@ -179,16 +174,16 @@ vif = pd.DataFrame(
 # >>> X, y = load_diabetes(return_X_y=True)
 # >>> estimators = [
 # ...     ('lr', RidgeCV()),
-# ...     ('svr', LinearSVR(random_state=random_state))
+# ...     ('svr', LinearSVR(random_state=RANDOM_STATE))
 # ... ]
 # >>> reg = StackingRegressor(
 # ...     estimators=estimators,
 # ...     final_estimator=RandomForestRegressor(n_estimators=10,
-# ...                                           random_state=random_state)
+# ...                                           random_state=RANDOM_STATE)
 # ... )
 # >>> from sklearn.model_selection import train_test_split
 # >>> X_train, X_test, y_train, y_test = train_test_split(
-# ...     X, y, random_state=random_state
+# ...     X, y, random_state=RANDOM_STATE
 # ... )
 # >>> reg.fit(X_train, y_train).score(X_test, y_test)
 # 0.3...
@@ -223,7 +218,7 @@ vif = pd.DataFrame(
 # """
 # =============================================================================
 
-# regression = GradientBoostingRegressor(random_state=random_state)
+# regression = GradientBoostingRegressor(random_state=RANDOM_STATE)
 # param_grid = {
 #     'n_estimators': [100, 200, 500],
 #     'max_features': ['auto', 'sqrt', 'log2'],
@@ -250,12 +245,14 @@ X, y = df_scaled.pipe(get_X_y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.8)
 
 max_depth = 30
-for model in (
-    ElasticNetCV(cv=5, random_state=42),
-    LassoCV(cv=5, random_state=42),
-    RidgeCV(cv=5)
+cv = 5
+random_state = 42
+for solver in (
+    ElasticNetCV(cv=cv, random_state=random_state),
+    LassoCV(cv=cv, random_state=random_state),
+    RidgeCV(cv=cv)
 ):
-    regr_multirf = MultiOutputRegressor(model)
+    regr_multirf = MultiOutputRegressor(solver)
     regr_multirf.fit(X_train, y_train)
     y_multirf = regr_multirf.predict(X_test)
 
@@ -264,7 +261,7 @@ for model in (
     # =========================================================================
     plt.figure()
     size = 50
-    alpha = 0.4
+    alpha = .4
     plt.scatter(
         y_test[:, 0],
         y_test[:, 1],

@@ -37,16 +37,16 @@ print(f'TensorFlow Version: {tf.__version__}')
 df = get_data_frame()
 
 # =============================================================================
-# Data Preprocessing
+# Exploratory Data Analysis, EDA
+# =============================================================================
+df.info()
+print(df.describe())
+
+# =============================================================================
+# Data Preprocessing: Create Scaled DataFrame
 # =============================================================================
 scaler = StandardScaler()
 df_scaled = pd.DataFrame(data=scaler.fit_transform(df), columns=df.columns)
-
-# =============================================================================
-# Exploratory Data Analysis, EDA
-# =============================================================================
-df.describe()
-df.info()
 
 # =============================================================================
 # Variance Inflation Factor

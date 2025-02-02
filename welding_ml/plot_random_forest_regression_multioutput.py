@@ -25,25 +25,16 @@ x and y coordinate as output.
 #
 # License: BSD 3 clause
 
-from functools import cache
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 
-
-@cache
-def get_data_frame() -> pd.DataFrame:
-    return pd.read_csv('../data/ebw_data.csv')
-
-
-def get_X_y(df: pd.DataFrame) -> tuple[np.ndarray]:
-    return df.iloc[:, :4].values, df.iloc[:, 4:].values
-
+from .dataset import get_data_frame
+from .features import get_X_y
 
 # =============================================================================
 # Create dataset
@@ -60,14 +51,16 @@ X, y = df_scaled.pipe(get_X_y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.8)
 
 max_depth = 30
+random_state = 0
 regr_multirf = MultiOutputRegressor(
     RandomForestRegressor(
-        n_estimators=100, max_depth=max_depth, random_state=0)
+        n_estimators=100, max_depth=max_depth, random_state=random_state)
 )
 regr_multirf.fit(X_train, y_train)
 
+random_state = 2
 regr_rf = RandomForestRegressor(
-    n_estimators=100, max_depth=max_depth, random_state=2)
+    n_estimators=100, max_depth=max_depth, random_state=random_state)
 regr_rf.fit(X_train, y_train)
 
 # =============================================================================
@@ -81,7 +74,7 @@ y_rf = regr_rf.predict(X_test)
 # =============================================================================
 plt.figure()
 size = 50
-alpha = 0.4
+alpha = .4
 plt.scatter(
     y_test[:, 0],
     y_test[:, 1],

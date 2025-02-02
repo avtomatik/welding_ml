@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Feb  2 17:48:43 2025
+
+@author: alexandermikhailov
+"""
+
 import re
 
 

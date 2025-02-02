@@ -6,7 +6,8 @@ from .dataset import get_data_frame
 
 
 def get_X_y(df: pd.DataFrame) -> tuple[np.ndarray]:
-    return df.iloc[:, :4].values, df.iloc[:, 4:].values
+    n_columns = 4
+    return df.iloc[:, :n_columns].values, df.iloc[:, n_columns:].values
 
 
 def fit_scaler(feature: np.ndarray) -> StandardScaler:
