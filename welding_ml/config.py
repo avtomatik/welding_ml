@@ -18,6 +18,8 @@ DESCRIPTION = {
     'Width': 'Ширина шва'
 }
 
+DIMENSIONS = ('Depth', 'Width')
+
 CV = 5
 
 RANDOM_STATE = 42
