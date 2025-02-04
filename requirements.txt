@@ -5,3 +5,9 @@ mkdocs
 pip
 python-dotenv
 -e .
+Flask
+Flask-SQLAlchemy
+python-dotenv
+pytest
+gunicorn
+flasgger

@@ -15,8 +15,8 @@ from sklearn.model_selection import train_test_split, validation_curve
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from .config import RANDOM_STATE
 
+from .config import RANDOM_STATE
 from .dataset import get_data_frame
 from .features import get_X_y
 

@@ -11,49 +11,44 @@ Created on Tue Feb  4 21:52:45 2025
 # =============================================================================
 # =============================================================================
 # from flask import Flask
-# 
+#
 # from app.config.config import get_config_by_name
 # from app.initialize_functions import (initialize_db, initialize_route,
 #                                       initialize_swagger)
-# 
-# 
+#
+#
 # def create_app(config=None) -> Flask:
 #     """
 #     Create a Flask application.
-# 
+#
 #     Args:
 #         config: The configuration object to use.
-# 
+#
 #     Returns:
 #         A Flask application instance.
 #     """
 #     app = Flask(__name__)
 #     if config:
 #         app.config.from_object(get_config_by_name(config))
-# 
+#
 #     # Initialize extensions
 #     initialize_db(app)
-# 
+#
 #     # Register blueprints
 #     initialize_route(app)
-# 
+#
 #     # Initialize Swagger
 #     initialize_swagger(app)
-# 
+#
 #     return app
 # =============================================================================
 
-import sys
 
 import numpy as np
 from flask import Flask, render_template, request
 
 from welding_ml.features import get_X_y_scalers
 from welding_ml.modeling.predict import load_trained_model
-
-SRC_DIR = '/home/green-machine/data_science/bmstu_graduate_project/src'
-sys.path.insert(1, SRC_DIR)
-
 
 app = Flask(__name__)
 
