@@ -6,9 +6,12 @@ Created on Thu Jan  9 22:12:05 2025
 @author: alexandermikhailov
 """
 
+from pathlib import Path
+
 # =============================================================================
 # Constants
 # =============================================================================
+
 DESCRIPTION = {
     'IW': 'Величина сварочного тока',
     'IF': 'Ток фокусировки электронного пучка',
@@ -24,4 +27,4 @@ CV = 5
 
 RANDOM_STATE = 42
 
-MODEL_DIR = '../models'
+MODEL_DIR = Path(__file__).resolve().parent.parent.joinpath('models')

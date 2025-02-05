@@ -63,7 +63,7 @@ Tiny Project in Machine Learning Applied to Precision Welding
 
 Mocking Input Parameters:
 ```
-input_params = "   44 146    9  60"
+input_features = "   44 146    9  60"
 ```
 Returns:
 ```
