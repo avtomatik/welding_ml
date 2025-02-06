@@ -53,26 +53,31 @@ def create_app(config=None) -> Flask:
 
     model = load_trained_model()
 
-    @app.route('/', methods=['POST'])
+    @app.route('/', methods=['GET', 'POST'])
     def main():
-        input_features = request.form['input_features']
+        if request.method == 'GET':
+            return render_template('index.html')
 
-        # =====================================================================
-        # TODO: Extract `make_prediction` Function
-        # =====================================================================
+        if request.method == 'POST':
 
-        input_features_scaled = scaler_X.transform(
-            np.array(validate_input(input_features)).reshape(1, -1)
-        )
-        y_pred = scaler_y.inverse_transform(
-            model.predict(input_features_scaled)
-        )
+            input_features = request.form['input_features']
 
-        result = [
-            dict(zip(DIMENSIONS, map(lambda _: f'{_:,.6f}', row)))
-            for row in y_pred.tolist()
-        ]
+            # =================================================================
+            # TODO: Extract `make_prediction` Function
+            # =================================================================
 
-        return render_template('index.html', result=result[0])
+            input_features_scaled = scaler_X.transform(
+                np.array(validate_input(input_features)).reshape(1, -1)
+            )
+            y_pred = scaler_y.inverse_transform(
+                model.predict(input_features_scaled)
+            )
+
+            result = [
+                dict(zip(DIMENSIONS, map(lambda _: f'{_:,.6f}', row)))
+                for row in y_pred.tolist()
+            ]
+
+            return render_template('index.html', result=result[0])
 
     return app
