@@ -59,16 +59,15 @@ Tiny Project in Machine Learning Applied to Precision Welding
 
 --------
 
-# bmstu_graduate_project
+# Showcase
 
-Mocking Input Parameters:
+Entering This String:
 ```
-input_features = "   44 146    9  60"
+   44 146    9  60
 ```
-Returns:
+Will Yield You:
 ```
-{'Depth': '1.204049', 'Width': '1.846469'}
+{'Depth': '1.197960', 'Width': '1.793414'}
 ```
 
-# TODO : Deploy Flask App
-<!-- to render.com -->
+# TODO : Pack to Docker, Deploy Flask App

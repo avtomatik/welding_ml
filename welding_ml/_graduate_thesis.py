@@ -25,7 +25,7 @@ from .config import CV, MODEL_DIR, RANDOM_STATE
 from .dataset import get_data_frame
 from .features import get_X_y
 from .plots import plot_model_train_val_losses, plot_multi_output_solver
-from .utils import trim_string
+from .services import trim_string
 
 print(f'scikit-learn Version: {sklearn.__version__}')
 print(f'TensorFlow Version: {tf.__version__}')

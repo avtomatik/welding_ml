@@ -11,3 +11,7 @@ import re
 
 def trim_string(string: str, fill: str = ' ') -> str:
     return fill.join(filter(lambda _: _, re.split(r'\W', string))).lower()
+
+
+def validate_input(string: str) -> list[float]:
+    return list(map(float, string.split()))
