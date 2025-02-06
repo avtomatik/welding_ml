@@ -61,6 +61,12 @@ Tiny Project in Machine Learning Applied to Precision Welding
 
 # Showcase
 
+## Run Application
+```
+pip install -r requirements.txt --no-cache-dir
+flask run
+```
+
 Entering This String:
 ```
    44 146    9  60
