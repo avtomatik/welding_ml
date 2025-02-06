@@ -51,10 +51,7 @@ from welding_ml.config import DIMENSIONS
 from welding_ml.features import get_X_y_scalers
 from welding_ml.modeling.predict import load_trained_model
 
-
-def validate_input(input_features):
-    return list(map(float, input_features.split()))
-
+from .services import validate_input
 
 app = Flask(__name__)
 
@@ -71,10 +68,17 @@ def main():
     if request.method == 'POST':
 
         input_features = request.form['input_features']
-        scaled_input = scaler_X.transform(
+
+# =============================================================================
+# TODO: Extract `make_prediction` Function
+# =============================================================================
+
+        input_features_scaled = scaler_X.transform(
             np.array(validate_input(input_features)).reshape(1, -1)
         )
-        y_pred = scaler_y.inverse_transform(model.predict(scaled_input))
+        y_pred = scaler_y.inverse_transform(
+            model.predict(input_features_scaled)
+        )
 
         result = [
             dict(zip(DIMENSIONS, map(lambda _: f'{_:,.6f}', row)))
