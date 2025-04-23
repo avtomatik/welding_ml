@@ -7,12 +7,12 @@ Created on Tue Feb  4 21:52:45 2025
 """
 
 from flask import Flask, render_template, request
+
+from app.config.config import get_config_by_name
 from welding_ml.config import DIMENSIONS
 from welding_ml.features import get_X_y_scalers
 from welding_ml.modeling.predict import (load_trained_model,
                                          make_prediction_scaled)
-
-from app.config.config import get_config_by_name
 
 
 def create_app(config=None) -> Flask:
@@ -49,13 +49,11 @@ def create_app(config=None) -> Flask:
                 scaler_y
             ).flatten()
 
-            data = dict(
-                zip(
-                    DIMENSIONS,
-                    map(lambda _: f'{_:,.6f}', y_pred.tolist())
-                )
-            )
+            result = {
+                name: f'{value:,.6f}'
+                for name, value in zip(DIMENSIONS, y_pred.tolist())
+            }
 
-            return render_template('index.html', result=data)
+            return render_template('index.html', result=result)
 
     return app

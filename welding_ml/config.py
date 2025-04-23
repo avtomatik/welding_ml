@@ -27,4 +27,8 @@ CV = 5
 
 RANDOM_STATE = 42
 
-MODEL_DIR = Path(__file__).resolve().parent.parent.joinpath('models')
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DATA_DIR = BASE_DIR.joinpath('data')
+
+MODEL_DIR = BASE_DIR.joinpath('models')
